@@ -35,12 +35,16 @@
     $(document).ready(function() {
       $('#fullscreenButton').click(function() {
         var element = document.documentElement;
-        if (element.webkitEnterFullscreen) {
-          element.webkitEnterFullscreen();
+        if (element.requestFullscreen) {
+          element.requestFullscreen();
+        } else if (element.msRequestFullscreen) {
+          element.msRequestFullscreen();
+        } else if (element.mozRequestFullScreen) {
+          element.mozRequestFullScreen();
         } else if (element.webkitRequestFullscreen) {
-          element.webkitRequestFullscreen();
+          element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
         } else {
-          alert('Fullscreen not supported on this browser.');
+          alert('Fullscreen API is not supported.');
         }
       });
     });
