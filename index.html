@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fullscreen Toggle</title>
+  <title>Fullscreen Toggle for iOS</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
     body, html {
@@ -26,59 +26,21 @@
       border: none;
       border-radius: 5px;
     }
-
-    .fullscreen {
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 999;
-      background: white;
-    }
   </style>
 </head>
 <body>
-  <button id="fullscreenButton">Toggle Fullscreen</button>
+  <button id="fullscreenButton">Toggle Fullscreen (iOS)</button>
 
   <script>
     $(document).ready(function() {
-      function isIOS() {
-        return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      }
-
       $('#fullscreenButton').click(function() {
-        if (isIOS()) {
-          // Use CSS to mimic fullscreen on iOS
-          if ($('body').hasClass('fullscreen')) {
-            $('body').removeClass('fullscreen');
-          } else {
-            $('body').addClass('fullscreen');
-            window.scrollTo(0, 0); // Ensure the window is scrolled to the top
-          }
+        var element = document.documentElement;
+        if (element.webkitEnterFullscreen) {
+          element.webkitEnterFullscreen();
+        } else if (element.webkitRequestFullscreen) {
+          element.webkitRequestFullscreen();
         } else {
-          if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
-            if (document.documentElement.requestFullscreen) {
-              document.documentElement.requestFullscreen();
-            } else if (document.documentElement.msRequestFullscreen) {
-              document.documentElement.msRequestFullscreen();
-            } else if (document.documentElement.mozRequestFullScreen) {
-              document.documentElement.mozRequestFullScreen();
-            } else if (document.documentElement.webkitRequestFullscreen) {
-              document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-            }
-          } else {
-            if (document.exitFullscreen) {
-              document.exitFullscreen();
-            } else if (document.msExitFullscreen) {
-              document.msExitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-              document.mozCancelFullScreen();
-            } else if (document.webkitExitFullscreen) {
-              document.webkitExitFullscreen();
-            }
-          }
+          alert('Fullscreen not supported on this browser.');
         }
       });
     });
