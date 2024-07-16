@@ -21,7 +21,7 @@
       top: 10px;
       left: 10px;
       z-index: 1000;
-      color:green;
+      color:yellow;
     }
 
     .fullscreen {
@@ -34,10 +34,22 @@
       z-index: 999;
       background: white;
     }
+
+    .fullscreen-fix {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 999;
+      background: white;
+    }
   </style>
 </head>
 <body>
   <button id="fullscreenButton">Toggle Fullscreen</button>
+  <div id="fullscreenContent" class="fullscreen-fix"></div>
 
   <script>
     $(document).ready(function() {
@@ -48,7 +60,7 @@
       $('#fullscreenButton').click(function() {
         if (isIOS()) {
           // Use CSS to mimic fullscreen on iOS
-          $('body').toggleClass('fullscreen');
+          $('#fullscreenContent').toggleClass('fullscreen');
         } else {
           if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
             if (document.documentElement.requestFullscreen) {
