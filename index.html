@@ -6,10 +6,32 @@
   <title>Fullscreen Toggle</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+    }
+
     #fullscreenButton {
       padding: 10px 20px;
       font-size: 16px;
       cursor: pointer;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+    }
+
+    .fullscreen {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 999;
+      background: white;
     }
   </style>
 </head>
@@ -18,29 +40,36 @@
 
   <script>
     $(document).ready(function() {
+      function isIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      }
+
       $('#fullscreenButton').click(function() {
-        if (!document.fullscreenElement &&    // alternative standard method
-            !document.mozFullScreenElement && // Firefox
-            !document.webkitFullscreenElement && // Chrome, Safari and Opera
-            !document.msFullscreenElement) {  // IE/Edge
-          if (document.documentElement.requestFullscreen) {
-            document.documentElement.requestFullscreen();
-          } else if (document.documentElement.msRequestFullscreen) {
-            document.documentElement.msRequestFullscreen();
-          } else if (document.documentElement.mozRequestFullScreen) {
-            document.documentElement.mozRequestFullScreen();
-          } else if (document.documentElement.webkitRequestFullscreen) {
-            document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-          }
+        if (isIOS()) {
+          // Use CSS to mimic fullscreen on iOS
+          $('body').toggleClass('fullscreen');
+          window.scrollTo(0, 0); // Ensure the window is scrolled to the top
         } else {
-          if (document.exitFullscreen) {
-            document.exitFullscreen();
-          } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-          } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-          } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
+          if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+            if (document.documentElement.requestFullscreen) {
+              document.documentElement.requestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) {
+              document.documentElement.msRequestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) {
+              document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+              document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+            }
+          } else {
+            if (document.exitFullscreen) {
+              document.exitFullscreen();
+            } else if (document.msExitFullscreen) {
+              document.msExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+              document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+              document.webkitExitFullscreen();
+            }
           }
         }
       });
