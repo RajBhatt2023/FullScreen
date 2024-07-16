@@ -3,95 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fullscreen Toggle for iOS</title>
+  <title>Fullscreen Simulation for a div on iOS (Safari)</title>
   <style>
     body, html {
       margin: 0;
       padding: 0;
       height: 100%;
       width: 100%;
-      overflow: hidden; /* Prevent scrolling in fullscreen */
     }
 
-    #fullscreenButton {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 1000;
-      background-color: yellow;
-      color: red;
-      border: none;
-      border-radius: 5px;
-    }
-
-    .fullscreen {
+    .fullscreen-div {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: white;
+      width: 100vw;
+      height: 100vh;
+      background-color: white; /* Adjust as needed */
       z-index: 999;
+      /* Additional styles to make it visually appear as fullscreen */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* Add any other styles to match your fullscreen appearance */
     }
   </style>
 </head>
 <body>
-  <button id="fullscreenButton">Toggle Fullscreen (iOS)</button>
+  <div id="fullscreenDiv" class="fullscreen-div">
+    <!-- Content of your fullscreen div -->
+    <h1>Fullscreen Content</h1>
+    <p>This is fullscreen content.</p>
+  </div>
+
+  <!-- Button to toggle fullscreen -->
+  <button id="toggleFullscreenButton">Toggle Fullscreen</button>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      var fullscreenButton = document.getElementById('fullscreenButton');
+      var fullscreenDiv = document.getElementById('fullscreenDiv');
+      var toggleFullscreenButton = document.getElementById('toggleFullscreenButton');
       var isFullscreen = false;
 
-      fullscreenButton.addEventListener('click', function() {
+      toggleFullscreenButton.addEventListener('click', function() {
         toggleFullscreen();
       });
 
       function toggleFullscreen() {
-        var elem = document.documentElement;
-
         if (!isFullscreen) {
-          enterFullscreen(elem);
+          enterFullscreen();
         } else {
           exitFullscreen();
         }
       }
 
-      function enterFullscreen(element) {
-        if (element.requestFullscreen) {
-          element.requestFullscreen();
-        } else if (element.msRequestFullscreen) {
-          element.msRequestFullscreen();
-        } else if (element.mozRequestFullScreen) {
-          element.mozRequestFullScreen();
-        } else if (element.webkitRequestFullscreen) {
-          element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-        } else {
-          alert('Fullscreen API is not supported.');
-          return;
-        }
-        
-        // Add a class to simulate fullscreen effect
-        document.body.classList.add('fullscreen');
+      function enterFullscreen() {
+        // Expand the div to cover the viewport
+        fullscreenDiv.classList.add('fullscreen-div');
         isFullscreen = true;
       }
 
       function exitFullscreen() {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        } else if (document.msExitFullscreen) {
-          document.msExitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-          document.mozCancelFullScreen();
-        } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        }
-
-        // Remove the fullscreen class
-        document.body.classList.remove('fullscreen');
+        // Remove fullscreen styles
+        fullscreenDiv.classList.remove('fullscreen-div');
         isFullscreen = false;
       }
     });
