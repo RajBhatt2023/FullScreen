@@ -3,51 +3,94 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fullscreen Toggle for iOS</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <title>Camera Autofocus Example</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
   <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
+    #video, #canvas {
+      display: block;
     }
-
-    #fullscreenButton {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 1000;
-      background-color: yellow;
-      color: red;
-      border: none;
-      border-radius: 5px;
+    #canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
     }
   </style>
 </head>
 <body>
-  <button id="fullscreenButton">Toggle Fullscreen (iOS 2)</button>
+  <button id="start-camera">Start Camera</button>
+  <div style="position: relative;">
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
+  </div>
 
   <script>
-   $(document).ready(function() {
-      $('#fullscreenButton').click(function() {
-        var element = document.documentElement;
-        if (element.requestFullscreen) {
-          element.requestFullscreen();
-        } else if (element.msRequestFullscreen) {
-          element.msRequestFullscreen();
-        } else if (element.mozRequestFullScreen) {
-          element.mozRequestFullScreen();
-        } else if (element.webkitRequestFullscreen) {
-          element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-        } else {
-          alert('Fullscreen API is not supported.');
-        }
+    let model;
+
+    // Load the object detection model
+    async function loadModel() {
+      model = await cocoSsd.load();
+      console.log('Model loaded');
+    }
+
+    // Detect objects in the video frame
+    async function detectObjects(video, context) {
+      const predictions = await model.detect(video);
+      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
+      predictions.forEach(prediction => {
+        context.beginPath();
+        context.rect(...prediction.bbox);
+        context.lineWidth = 2;
+        context.strokeStyle = 'green';
+        context.fillStyle = 'green';
+        context.stroke();
+        context.fillText(
+          prediction.class + ': ' + Math.round(prediction.score * 100) + '%',
+          prediction.bbox[0],
+          prediction.bbox[1] > 10 ? prediction.bbox[1] - 5 : 10
+        );
       });
+
+      if (predictions.length > 0) {
+        autofocus(predictions);
+      }
+
+      requestAnimationFrame(() => detectObjects(video, context));
+    }
+
+    // Simulated autofocus function
+    function autofocus(predictions) {
+      console.log('Object detected! Autofocusing...');
+
+      const mainObject = predictions[0]; // Assume the first detected object is the main one
+      const [x, y, width, height] = mainObject.bbox;
+
+      console.log(`Focusing on object at (${x}, ${y}) with size (${width}x${height})`);
+
+      // Implement actual autofocus logic here if supported by the device
+    }
+
+    document.getElementById('start-camera').addEventListener('click', async function() {
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      const context = canvas.getContext('2d');
+
+      // Access the camera
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        video.srcObject = stream;
+
+        await loadModel();
+
+        // Once the video is playing, start object detection
+        video.addEventListener('play', () => {
+          detectObjects(video, context);
+        });
+      } catch (error) {
+        console.error('Error accessing camera: ', error);
+      }
     });
   </script>
 </body>
-</html> 
+</html>
